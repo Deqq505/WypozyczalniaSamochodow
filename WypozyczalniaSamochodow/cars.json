@@ -1,0 +1,24 @@
+﻿[
+  {
+    "Id": 1,
+    "Brand": "Toyota",
+    "Model": "Corolla",
+    "Year": 2020,
+    "Color": "Czerwony",
+    "RentalPrice": 100,
+    "IsAvailable": false,
+    "RenterSurname": "Godziek",
+    "Mileage": 15000
+  },
+  {
+    "Id": 2,
+    "Brand": "Honda",
+    "Model": "Civic",
+    "Year": 2019,
+    "Color": "Niebieski",
+    "RentalPrice": 120,
+    "IsAvailable": true,
+    "RenterSurname": "",
+    "Mileage": 20000
+  }
+]
