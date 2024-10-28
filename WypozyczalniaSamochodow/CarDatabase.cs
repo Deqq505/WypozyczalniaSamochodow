@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
 public class CarDatabase
 {
-    private const string FilePath = "C:\\Users\\godzi\\OneDrive\\Studia informatyka- Rok 2, sem 3\\Programowanie III\\Wypozyczalnia samochodow\\Wypozyczalnia samochodow\\cars.json";
+    private const string FilePath = "..\\..\\..\\cars.json";
 
     public List<Car> LoadCars()
     {
         if (!File.Exists(FilePath))
         {
-            // Zwracamy pustą listę, jeśli plik nie istnieje
             return new List<Car>();
         }
 
@@ -24,17 +24,29 @@ public class CarDatabase
         {
             var json = JsonSerializer.Serialize(cars, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(FilePath, json);
-            Console.WriteLine("Dane zostały zapisane do pliku JSON.");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Wystąpił błąd przy zapisie do pliku: {ex.Message}");
         }
-
-
     }
 
+    public void ReserveCar(int carId, string renterSurname, int rentalDays)
+    {
+        var cars = LoadCars();
+        var car = cars.Find(c => c.Id == carId);
 
-
-
+        if (car != null && car.IsAvailable)
+        {
+            car.IsAvailable = false;
+            car.RenterSurname = renterSurname;
+            car.RentalDays = rentalDays;
+            SaveCars(cars);
+            Console.WriteLine($"Samochód o ID {carId} został pomyślnie zarezerwowany na {rentalDays} dni dla {renterSurname}.");
+        }
+        else
+        {
+            Console.WriteLine($"Samochód o ID {carId} jest niedostępny lub nie istnieje.");
+        }
+    }
 }
