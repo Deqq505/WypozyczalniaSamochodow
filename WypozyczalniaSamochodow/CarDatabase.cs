@@ -30,23 +30,4 @@ public class CarDatabase
             Console.WriteLine($"Wystąpił błąd przy zapisie do pliku: {ex.Message}");
         }
     }
-
-    public void ReserveCar(int carId, string renterSurname, int rentalDays)
-    {
-        var cars = LoadCars();
-        var car = cars.Find(c => c.Id == carId);
-
-        if (car != null && car.IsAvailable)
-        {
-            car.IsAvailable = false;
-            car.RenterSurname = renterSurname;
-            car.RentalDays = rentalDays;
-            SaveCars(cars);
-            Console.WriteLine($"Samochód o ID {carId} został pomyślnie zarezerwowany na {rentalDays} dni dla {renterSurname}.");
-        }
-        else
-        {
-            Console.WriteLine($"Samochód o ID {carId} jest niedostępny lub nie istnieje.");
-        }
-    }
 }
