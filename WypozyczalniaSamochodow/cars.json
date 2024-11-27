@@ -19,10 +19,10 @@
     "Year": 2019,
     "Color": "Niebieski",
     "RentalPrice": 120,
-    "IsAvailable": true,
-    "RenterSurname": "",
+    "IsAvailable": false,
+    "RenterSurname": "Godziek",
     "Mileage": 20000,
-    "RentalDays": 0,
-    "TotalCost": 0
+    "RentalDays": 2,
+    "TotalCost": 240
   }
 ]
