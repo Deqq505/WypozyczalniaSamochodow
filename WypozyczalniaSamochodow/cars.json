@@ -6,11 +6,11 @@
     "Year": 2020,
     "Color": "Czerwony",
     "RentalPrice": 100,
-    "IsAvailable": true,
-    "RenterSurname": "",
+    "IsAvailable": false,
+    "RenterSurname": "Godziek",
     "Mileage": 15000,
-    "RentalDays": 0,
-    "TotalCost": 0
+    "RentalDays": 5,
+    "TotalCost": 500
   },
   {
     "Id": 2,
@@ -19,10 +19,10 @@
     "Year": 2019,
     "Color": "Niebieski",
     "RentalPrice": 120,
-    "IsAvailable": false,
-    "RenterSurname": "Godziek",
+    "IsAvailable": true,
+    "RenterSurname": "",
     "Mileage": 20000,
-    "RentalDays": 2,
-    "TotalCost": 240
+    "RentalDays": 0,
+    "TotalCost": 0
   }
 ]
