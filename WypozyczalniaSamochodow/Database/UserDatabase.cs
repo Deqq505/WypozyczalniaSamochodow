@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
-public class CarDatabase
+public class UserDatabase
 {
-    private const string FilePath = "..\\..\\..\\cars.json";
+    private const string FilePath = "..\\..\\..\\Entities\\users.json";
 
-    public List<Car> LoadCars()
+    public List<User> LoadUsers()
     {
         if (!File.Exists(FilePath))
         {
-            return new List<Car>();
+            return new List<User>();
         }
 
         var json = File.ReadAllText(FilePath);
-        return JsonSerializer.Deserialize<List<Car>>(json) ?? new List<Car>();
+        return JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
     }
 
-    public void SaveCars(List<Car> cars)
+    public void SaveUsers(List<User> users)
     {
         try
         {
-            var json = JsonSerializer.Serialize(cars, new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonSerializer.Serialize(users, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(FilePath, json);
         }
         catch (Exception ex)

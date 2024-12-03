@@ -15,15 +15,12 @@ class Program
 
         User currentUser = UserService.LoginUser(users);
 
-        // Po udanym logowaniu
         if (currentUser.IsAdmin)
         {
-            // Panel administratora
             UserService.AdminPanel(cars, carDatabase, users, userDatabase);
         }
         else
         {
-            // Panel pracownika
             UserService.EmployeePanel(cars, carDatabase, currentUser);
         }
     }

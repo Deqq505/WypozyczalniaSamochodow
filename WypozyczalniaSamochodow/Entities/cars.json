@@ -25,6 +25,6 @@
     "Mileage": 20000,
     "RentalDays": 0,
     "TotalCost": 0,
-    "AssignedEmployee": null
+    "AssignedEmployee": ""
   }
 ]
