@@ -8,49 +8,23 @@ class Program
         Console.Title = "Wypożyczalnia Samochodów";
 
         CarDatabase carDatabase = new CarDatabase();
+        UserDatabase userDatabase = new UserDatabase();
+
         List<Car> cars = carDatabase.LoadCars();
+        List<User> users = userDatabase.LoadUsers();
 
-        while (true)
+        User currentUser = UserService.LoginUser(users);
+
+        // Po udanym logowaniu
+        if (currentUser.IsAdmin)
         {
-            Console.Clear();
-            MenuService.DisplayHeader("Wypożyczalnia Samochodów");
-
-            Console.WriteLine("Menu:");
-            Console.WriteLine("1. Wyświetl dostępne samochody");
-            Console.WriteLine("2. Wyświetl wszystkie samochody");
-            Console.WriteLine("3. Zarezerwuj samochód");
-            Console.WriteLine("4. Sprawdź nazwisko wynajmującego");
-            Console.WriteLine("5. Opłać wynajem");
-            Console.WriteLine("6. Wyjście");
-            Console.Write("\nWybierz opcję: ");
-
-            string choice = Console.ReadLine();
-            switch (choice)
-            {
-                case "1":
-                    CarService.DisplayAvailableCars(cars);
-                    break;
-                case "2":
-                    CarService.DisplayAllCars(cars);
-                    break;
-                case "3":
-                    CarService.ReserveCar(cars, carDatabase);
-                    break;
-                case "4":
-                    CarService.CheckRenterSurname(cars);
-                    break;
-                case "5":
-                    CarService.PayForRental(cars, carDatabase);
-                    break;
-                case "6":
-                    return;
-                default:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\nNiepoprawna opcja. Naciśnij dowolny klawisz, aby spróbować ponownie.");
-                    Console.ResetColor();
-                    Console.ReadKey();
-                    break;
-            }
+            // Panel administratora
+            UserService.AdminPanel(cars, carDatabase, users, userDatabase);
+        }
+        else
+        {
+            // Panel pracownika
+            UserService.EmployeePanel(cars, carDatabase, currentUser);
         }
     }
 }

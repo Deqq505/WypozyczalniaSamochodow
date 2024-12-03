@@ -12,9 +12,11 @@
     public int RentalDays { get; set; }
     public double TotalCost => RentalDays * RentalPrice;
 
+    public string AssignedEmployee { get; set; }
+
     public override string ToString()
     {
         return $"{Id} | {Brand} | {Model} | {Year} | {Color} | {RentalPrice} PLN/dzień | " +
-               $"{(IsAvailable ? "Dostępny" : $"Zarezerwowany przez: {RenterSurname}, na {RentalDays} dni")}";
+               $"{(IsAvailable ? "Dostępny" : $"Zarezerwowany przez: {RenterSurname}, na {RentalDays} dni")} ";
     }
 }

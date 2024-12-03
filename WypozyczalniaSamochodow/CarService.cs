@@ -44,7 +44,7 @@ public static class CarService
         Console.ReadKey();
     }
 
-    public static void ReserveCar(List<Car> cars, CarDatabase carDatabase)
+    public static void ReserveCar(List<Car> cars, CarDatabase carDatabase, User loggedInUser)
     {
         Console.Clear();
         MenuService.DisplayHeader("Rezerwacja Samochodu");
@@ -82,10 +82,13 @@ public static class CarService
                             carToReserve.RentalDays = rentalDays;
                             carToReserve.IsAvailable = false;
 
+                            carToReserve.AssignedEmployee = $"{loggedInUser.FirstName} {loggedInUser.LastName}";
+
                             carDatabase.SaveCars(cars);
 
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine($"\nRezerwacja samochodu {carToReserve.Model} została pomyślnie dokonana przez {carToReserve.RenterSurname}.");
+                            Console.WriteLine($"Rezerwacja dokonała: {carToReserve.AssignedEmployee}");
                             Console.ResetColor();
                         }
                         else
@@ -231,6 +234,7 @@ public static class CarService
                         carToPay.IsAvailable = true;
                         carToPay.RenterSurname = "";
                         carToPay.RentalDays = 0;
+                        carToPay.AssignedEmployee = "";
 
                         carDatabase.SaveCars(cars);
 
