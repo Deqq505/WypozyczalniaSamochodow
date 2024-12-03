@@ -174,6 +174,7 @@ public static class CarService
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine($"Samochód {car.Model} ({car.Brand}) jest wynajęty przez {car.RenterSurname} na {car.RentalDays} dni.");
                         Console.WriteLine($"Koszt wynajmu: {car.TotalCost} PLN");
+                        Console.WriteLine($"Rezerwacja wykonana przez pracownika: {car.AssignedEmployee}");
                         found = true;
                     }
                 }
