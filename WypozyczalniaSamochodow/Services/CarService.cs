@@ -9,23 +9,9 @@ public static class CarService
         MenuService.DisplayHeader("Dostępne Samochody");
 
         var availableCars = cars.FindAll(c => c.IsAvailable);
-        if (availableCars.Count == 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("Brak dostępnych samochodów.");
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("Dostępne samochody:");
-            foreach (var car in availableCars)
-            {
-                Console.WriteLine(car);
-            }
-        }
-        Console.ResetColor();
-        Console.WriteLine("\nNaciśnij dowolny klawisz, aby wrócić do menu.");
-        Console.ReadKey();
+        DisplayCarList(availableCars, "Brak dostępnych samochodów.");
+
+        WaitForUserInput();
     }
 
     public static void DisplayAllCars(List<Car> cars)
@@ -33,15 +19,9 @@ public static class CarService
         Console.Clear();
         MenuService.DisplayHeader("Wszystkie Samochody");
 
-        Console.ForegroundColor = ConsoleColor.Gray;
-        Console.WriteLine("Wszystkie samochody:");
-        foreach (var car in cars)
-        {
-            Console.WriteLine(car);
-        }
-        Console.ResetColor();
-        Console.WriteLine("\nNaciśnij dowolny klawisz, aby wrócić do menu.");
-        Console.ReadKey();
+        DisplayCarList(cars, "Brak samochodów w bazie.");
+
+        WaitForUserInput();
     }
 
     public static void ReserveCar(List<Car> cars, CarDatabase carDatabase, User loggedInUser)
@@ -57,69 +37,11 @@ public static class CarService
         }
         else
         {
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("Dostępne samochody do rezerwacji:");
-            foreach (var car in availableCars)
-            {
-                Console.WriteLine(car);
-            }
-
-            int carId = -1;
-            while (carId == -1)
-            {
-                Console.Write("\nPodaj ID samochodu do rezerwacji (lub wpisz 0, aby wrócić): ");
-                if (int.TryParse(Console.ReadLine(), out carId) && carId != 0)
-                {
-                    var carToReserve = cars.Find(c => c.Id == carId && c.IsAvailable);
-                    if (carToReserve != null)
-                    {
-                        Console.Write("Podaj nazwisko wynajmującego: ");
-                        carToReserve.RenterSurname = Console.ReadLine();
-
-                        Console.Write("Podaj liczbę dni wynajmu: ");
-                        if (int.TryParse(Console.ReadLine(), out int rentalDays))
-                        {
-                            carToReserve.RentalDays = rentalDays;
-                            carToReserve.IsAvailable = false;
-
-                            carToReserve.AssignedEmployee = $"{loggedInUser.FirstName} {loggedInUser.LastName}";
-
-                            carDatabase.SaveCars(cars);
-
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"\nRezerwacja samochodu {carToReserve.Model} została pomyślnie dokonana przez {carToReserve.RenterSurname}.");
-                            Console.WriteLine($"Rezerwacja dokonała: {carToReserve.AssignedEmployee}");
-                            Console.ResetColor();
-                        }
-                        else
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("\nNieprawidłowa liczba dni.");
-                            Console.ResetColor();
-                        }
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Samochód nie jest dostępny lub nie istnieje.");
-                        Console.ResetColor();
-                        carId = -1;
-                    }
-                }
-                else if (carId == 0)
-                {
-                    break;
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Nieprawidłowe ID.");
-                    Console.ResetColor();
-                }
-            }
+            DisplayCarList(availableCars);
+            HandleCarReservation(cars, carDatabase, loggedInUser);
         }
-        Console.WriteLine("\nNaciśnij dowolny klawisz, aby wrócić do menu.");
-        Console.ReadKey();
+
+        WaitForUserInput();
     }
 
     public static void CheckRenterSurname(List<Car> cars)
@@ -127,78 +49,19 @@ public static class CarService
         Console.Clear();
         MenuService.DisplayHeader("Sprawdzenie Wynajmującego");
 
-        while (true)
+        var renters = ExtractRenterSurnames(cars);
+        if (renters.Count == 0)
         {
-            var renters = new HashSet<string>();
-            foreach (var car in cars)
-            {
-                if (!string.IsNullOrEmpty(car.RenterSurname))
-                {
-                    renters.Add(car.RenterSurname);
-                }
-            }
-
-            if (renters.Count == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine("Brak wynajmujących samochodów.");
-                Console.WriteLine("\nNaciśnij dowolny klawisz, aby wrócić do menu.");
-                Console.ResetColor();
-                Console.ReadKey();
-                return;
-            }
-
             Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("Lista wynajmujących:");
-            foreach (var renter in renters)
-            {
-                Console.WriteLine($"- {renter}");
-            }
-
-            Console.ResetColor();
-            Console.Write("\nPodaj nazwisko wynajmującego (lub wpisz 0, aby wrócić): ");
-            string surnameToCheck = Console.ReadLine();
-
-            if (surnameToCheck == "0")
-            {
-                return;
-            }
-
-            if (renters.Contains(surnameToCheck))
-            {
-                bool found = false;
-                foreach (var car in cars)
-                {
-                    if (car.RenterSurname.Equals(surnameToCheck, StringComparison.OrdinalIgnoreCase))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"Samochód {car.Model} ({car.Brand}) jest wynajęty przez {car.RenterSurname} na {car.RentalDays} dni.");
-                        Console.WriteLine($"Koszt wynajmu: {car.TotalCost} PLN");
-                        Console.WriteLine($"Rezerwacja wykonana przez pracownika: {car.AssignedEmployee}");
-                        found = true;
-                    }
-                }
-
-                if (!found)
-                {
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.WriteLine("Brak wynajmowanych samochodów dla podanego nazwiska.");
-                    Console.ResetColor();
-                }
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine("\nNaciśnij dowolny klawisz, aby wrócić do menu.");
-                Console.ReadKey();
-                return;
-            }
-            else
-            {
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Nie znaleziono wynajmującego o podanym nazwisku.");
-                Console.WriteLine("Spróbuj ponownie.");
-                Console.ResetColor();
-            }
+            Console.WriteLine("Brak wynajmujących samochodów.");
         }
+        else
+        {
+            DisplayRenterList(renters);
+            HandleRenterCheck(cars);
+        }
+
+        WaitForUserInput();
     }
 
     public static void PayForRental(List<Car> cars, CarDatabase carDatabase)
@@ -214,55 +77,179 @@ public static class CarService
         }
         else
         {
+            DisplayCarList(rentedCars);
+            HandleRentalPayment(cars, carDatabase);
+        }
+
+        WaitForUserInput();
+    }
+
+
+    private static void DisplayCarList(List<Car> cars, string emptyMessage = "")
+    {
+        if (cars.Count == 0)
+        {
             Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine("Wynajęte samochody:");
-            foreach (var car in rentedCars)
+            Console.WriteLine(emptyMessage);
+        }
+        else
+        {
+            foreach (var car in cars)
             {
                 Console.WriteLine(car);
             }
+        }
+        Console.ResetColor();
+    }
 
-            int carId = -1;
-            while (carId == -1)
+    private static void WaitForUserInput()
+    {
+        Console.WriteLine("\nNaciśnij dowolny klawisz, aby wrócić do menu.");
+        Console.ReadKey();
+    }
+
+    private static void HandleCarReservation(List<Car> cars, CarDatabase carDatabase, User loggedInUser)
+    {
+        while (true)
+        {
+            Console.Write("\nPodaj ID samochodu do rezerwacji (lub wpisz 0, aby wrócić): ");
+            if (int.TryParse(Console.ReadLine(), out int carId) && carId != 0)
             {
-                Console.Write("\nPodaj ID samochodu do opłacenia (lub wpisz 0, aby wrócić): ");
-                if (int.TryParse(Console.ReadLine(), out carId) && carId != 0)
+                var carToReserve = cars.Find(c => c.Id == carId && c.IsAvailable);
+                if (carToReserve != null)
                 {
-                    var carToPay = rentedCars.Find(c => c.Id == carId);
-                    if (carToPay != null)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"Koszt wynajmu samochodu {carToPay.Model}: {carToPay.TotalCost} PLN");
-                        carToPay.IsAvailable = true;
-                        carToPay.RenterSurname = "";
-                        carToPay.RentalDays = 0;
-                        carToPay.AssignedEmployee = "";
-
-                        carDatabase.SaveCars(cars);
-
-                        Console.WriteLine("Wynajem opłacony i samochód zwolniony.");
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Nie znaleziono wynajętego samochodu o podanym ID.");
-                        Console.ResetColor();
-                        carId = -1;
-                    }
-                }
-                else if (carId == 0)
-                {
+                    CollectReservationDetails(carToReserve, loggedInUser);
+                    carDatabase.SaveCars(cars);
                     break;
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Nieprawidłowe ID.");
-                    Console.ResetColor();
+                    ShowError("Samochód nie jest dostępny lub nie istnieje.");
                 }
             }
+            else if (carId == 0)
+            {
+                break;
+            }
+            else
+            {
+                ShowError("Nieprawidłowe ID.");
+            }
         }
-        Console.WriteLine("\nNaciśnij dowolny klawisz, aby wrócić do menu.");
-        Console.ReadKey();
+    }
+
+    private static void CollectReservationDetails(Car car, User loggedInUser)
+    {
+        Console.Write("Podaj nazwisko wynajmującego: ");
+        car.RenterSurname = Console.ReadLine();
+
+        Console.Write("Podaj liczbę dni wynajmu: ");
+        if (int.TryParse(Console.ReadLine(), out int rentalDays))
+        {
+            car.RentalDays = rentalDays;
+            car.IsAvailable = false;
+            car.AssignedEmployee = $"{loggedInUser.FirstName} {loggedInUser.LastName}";
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\nRezerwacja samochodu {car.Model} została pomyślnie dokonana przez {car.RenterSurname}.");
+            Console.WriteLine($"Rezerwacja dokonała: {car.AssignedEmployee}");
+            Console.ResetColor();
+        }
+        else
+        {
+            ShowError("Nieprawidłowa liczba dni.");
+        }
+    }
+
+    private static HashSet<string> ExtractRenterSurnames(List<Car> cars)
+    {
+        var renters = new HashSet<string>();
+        foreach (var car in cars)
+        {
+            if (!string.IsNullOrEmpty(car.RenterSurname))
+            {
+                renters.Add(car.RenterSurname);
+            }
+        }
+        return renters;
+    }
+
+    private static void DisplayRenterList(HashSet<string> renters)
+    {
+        Console.WriteLine("Lista wynajmujących:");
+        foreach (var renter in renters)
+        {
+            Console.WriteLine($"- {renter}");
+        }
+    }
+
+    private static void HandleRenterCheck(List<Car> cars)
+    {
+        Console.Write("\nPodaj nazwisko wynajmującego (lub wpisz 0, aby wrócić): ");
+        string surnameToCheck = Console.ReadLine();
+
+        if (surnameToCheck == "0")
+        {
+            return;
+        }
+
+        var matchedCars = cars.FindAll(c => c.RenterSurname.Equals(surnameToCheck, StringComparison.OrdinalIgnoreCase));
+        if (matchedCars.Count > 0)
+        {
+            foreach (var car in matchedCars)
+            {
+                Console.WriteLine($"Samochód {car.Model} ({car.Brand}) jest wynajęty przez {car.RenterSurname} na {car.RentalDays} dni.");
+                Console.WriteLine($"Koszt wynajmu: {car.TotalCost} PLN\nRezerwacja wykonana przez: {car.AssignedEmployee}");
+            }
+        }
+        else
+        {
+            ShowError("Nie znaleziono wynajmującego o podanym nazwisku.");
+        }
+    }
+
+    private static void HandleRentalPayment(List<Car> cars, CarDatabase carDatabase)
+    {
+        while (true)
+        {
+            Console.Write("\nPodaj ID samochodu do opłacenia (lub wpisz 0, aby wrócić): ");
+            if (int.TryParse(Console.ReadLine(), out int carId) && carId != 0)
+            {
+                var carToPay = cars.Find(c => c.Id == carId);
+                if (carToPay != null && !carToPay.IsAvailable)
+                {
+                    carToPay.IsAvailable = true;
+                    carToPay.RenterSurname = "";
+                    carToPay.RentalDays = 0;
+                    carToPay.AssignedEmployee = "";
+
+                    carDatabase.SaveCars(cars);
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Wynajem opłacony i samochód zwolniony.");
+                    Console.ResetColor();
+                    break;
+                }
+                else
+                {
+                    ShowError("Nie znaleziono wynajętego samochodu o podanym ID.");
+                }
+            }
+            else if (carId == 0)
+            {
+                break;
+            }
+            else
+            {
+                ShowError("Nieprawidłowe ID.");
+            }
+        }
+    }
+
+    private static void ShowError(string message)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(message);
+        Console.ResetColor();
     }
 }

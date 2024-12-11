@@ -6,12 +6,12 @@
     "Year": 2020,
     "Color": "Czerwony",
     "RentalPrice": 100,
-    "IsAvailable": false,
-    "RenterSurname": "Godziek",
+    "IsAvailable": true,
+    "RenterSurname": "",
     "Mileage": 15000,
-    "RentalDays": 3,
-    "TotalCost": 300,
-    "AssignedEmployee": "Grzegorz Mrzyk"
+    "RentalDays": 0,
+    "TotalCost": 0,
+    "AssignedEmployee": ""
   },
   {
     "Id": 2,
