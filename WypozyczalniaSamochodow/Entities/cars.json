@@ -20,11 +20,11 @@
     "Year": 2019,
     "Color": "Niebieski",
     "RentalPrice": 120,
-    "IsAvailable": true,
-    "RenterSurname": "",
+    "IsAvailable": false,
+    "RenterSurname": "Mariusz",
     "Mileage": 20000,
-    "RentalDays": 0,
-    "TotalCost": 0,
-    "AssignedEmployee": ""
+    "RentalDays": 1,
+    "TotalCost": 120,
+    "AssignedEmployee": "Marek Kowalski"
   }
 ]
